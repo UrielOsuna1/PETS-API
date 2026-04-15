@@ -3,38 +3,26 @@ using PA_BACKEND.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// add services to the container
-
-// forzar carga de variables de entorno del launchSettings.json
-var launchSettings = builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
+// cargar configuración
+builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();
 
-// cors configuration - restringir en producción
+
+// ✅ CORS (FUNCIONANDO PARA ANGULAR)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
-        if (isDevelopment)
-        {
-            policy.AllowAnyOrigin()
-                  .AllowAnyMethod()
-                  .AllowAnyHeader();
-        }
-        else
-        {
-            // configuración más restrictiva para producción
-            policy.WithOrigins("https://tudominio.com") // reemplazar con dominios permitidos
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials();
-        }
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
-// middleware personalizado para manejar errores de validación de modelo
+
+// manejo de errores de modelo
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
@@ -56,7 +44,8 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options 
     };
 });
 
-// add authentication and authorization con validaciones estrictas
+
+// 🔐 AUTH
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
@@ -66,19 +55,19 @@ builder.Services.AddAuthentication("Bearer")
             ValidateIssuer = true,
             ValidateIssuerSigningKey = true,
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero, // sin skew para mayor seguridad
+            ClockSkew = TimeSpan.Zero,
             IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException(PA_BACKEND.DTOs.Common.SecureMessages.ConfigurationError))),
-            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new InvalidOperationException(PA_BACKEND.DTOs.Common.SecureMessages.ConfigurationError),
-            ValidAudience = builder.Configuration["Jwt:Audience"] ?? throw new InvalidOperationException(PA_BACKEND.DTOs.Common.SecureMessages.ConfigurationError),
-            // mapear el claim de rol para que [Authorize(Roles = "X")] funcione
+                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key missing"))),
+            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT Issuer missing"),
+            ValidAudience = builder.Configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT Audience missing"),
             RoleClaimType = System.Security.Claims.ClaimTypes.Role
         };
     });
 
 builder.Services.AddAuthorization();
 
-// dependency injection - repositories
+
+// 🧩 DI
 builder.Services.AddScoped<PA_BACKEND.Data.Interface.IAuthRepository, PA_BACKEND.Data.Repositories.AuthRepository>();
 builder.Services.AddScoped<PA_BACKEND.Data.Interface.ITokenRepository, PA_BACKEND.Data.Repositories.TokenRepository>();
 builder.Services.AddScoped<PA_BACKEND.Data.Interface.ICryptoRepository, PA_BACKEND.Data.Repositories.CryptoRepository>();
@@ -87,33 +76,32 @@ builder.Services.AddScoped<PA_BACKEND.Data.Interface.IGatewayRepository, PA_BACK
 builder.Services.AddSingleton<PostgreSQLConfiguration>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<MascotaService>();
-
 builder.Services.AddScoped<PetStatusService>();
 
-// database configuration
 builder.Services.AddSingleton<PA_BACKEND.Data.PostgreSQLConfiguration>();
-builder.Services.AddSingleton<Microsoft.Extensions.Configuration.IConfiguration>(builder.Configuration);
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// 📄 SWAGGER (ACTIVO EN PRODUCCIÓN)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { 
-        Title = "PA Backend API", 
+    c.SwaggerDoc("v1", new()
+    {
+        Title = "PA Backend API",
         Version = "v1",
         Description = "API para el sistema de protección animal"
     });
-    
-    // configuración para jwt bearer
+
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Description = "Authorization: Bearer {token}",
         Name = "Authorization",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-    
+
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
@@ -130,27 +118,27 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
 var app = builder.Build();
 
-// configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "PA Backend API v1");
-        c.RoutePrefix = "swagger";
-    });
-}
 
-// middleware global para manejo de excepciones
+// 🌐 SWAGGER SIEMPRE ACTIVO
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "PA Backend API v1");
+    c.RoutePrefix = "swagger";
+});
+
+
+// 🛑 manejo global de errores
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
     {
         context.Response.StatusCode = 500;
         context.Response.ContentType = "application/json";
-        
+
         var response = new PA_BACKEND.DTOs.Common.ResponseAPIDTO<object>
         {
             Success = false,
@@ -163,21 +151,19 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
-// use CORS
+
+// ✅ ORDEN CORRECTO (CLAVE)
 app.UseCors("AllowAll");
-
-// fix authorization headers (agrega Bearer si falta)
-app.UseAuthorizationHeaderFix();
-
-// validate token blacklist (revoked tokens)
-app.UseTokenBlacklistValidation();
-
-// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseAuthorizationHeaderFix();
+app.UseTokenBlacklistValidation();
+
 app.MapControllers();
 
+
+// 🚀 PUERTO PARA RAILWAY
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Run($"http://0.0.0.0:{port}");
