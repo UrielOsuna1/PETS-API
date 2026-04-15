@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PA-BACKEND.Data")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a40d5a540b6d790e705407d84051468b62debc59")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e00a8c683e0f733153d7631fc9aa0b08a1a444a4")]
 [assembly: System.Reflection.AssemblyProductAttribute("PA-BACKEND.Data")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PA-BACKEND.Data")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
