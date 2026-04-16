@@ -14,7 +14,7 @@ namespace PA_BACKEND.Data.Repositories
 {
     /// <summary>
     /// implementación del repositorio de autenticación.
-    /// contiene la lógica de autenticación y generación de tokens.
+    /// contiene la lógica de autenticación y generación de tokens.ac
     /// </summary>
     public class AuthRepository : IAuthRepository
     {

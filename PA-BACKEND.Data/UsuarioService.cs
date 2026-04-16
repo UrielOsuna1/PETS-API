@@ -123,5 +123,39 @@ namespace PA_BACKEND.Data
 
             await cmd.ExecuteNonQueryAsync();
         }
+        public async Task<UsuarioDTO?> Login(string email, string password)
+        {
+            using var conn = _config.GetConnection();
+            await conn.OpenAsync();
+
+            var emailHash = Hash(email);
+
+            var cmd = new NpgsqlCommand(@"
+        SELECT id, first_name, last_name, password_hash
+        FROM users
+        WHERE email_hash = @eh AND deleted_at IS NULL
+        LIMIT 1", conn);
+
+            cmd.Parameters.AddWithValue("@eh", emailHash);
+
+            var reader = await cmd.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                var passwordHash = reader.GetString(3);
+
+                if (BCrypt.Net.BCrypt.Verify(password, passwordHash))
+                {
+                    return new UsuarioDTO
+                    {
+                        Id = reader.GetInt32(0),
+                        FirstName = reader.GetString(1),
+                        LastName = reader.GetString(2)
+                    };
+                }
+            }
+
+            return null;
+        }
     }
 }
