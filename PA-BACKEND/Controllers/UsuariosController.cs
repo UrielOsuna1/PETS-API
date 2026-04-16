@@ -22,11 +22,11 @@ namespace PA_BACKEND.Controllers
             try
             {
                 await _service.RegistrarUsuario(dto);
-                return Ok("Usuario registrado");
+                return Ok(new { message = "Usuario registrado correctamente" });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, new { message = "Error interno", detail = ex.Message });
             }
         }
 
