@@ -23,7 +23,7 @@ namespace PA_BACKEND.Controllers
                 var user = await _service.Login(dto.Email, dto.Password);
 
                 if (user == null)
-                    return Unauthorized("Credenciales incorrectas");
+                    return Unauthorized("Credenciales incorrectas"); 
 
                 return Ok(new
                 {

@@ -131,7 +131,7 @@ namespace PA_BACKEND.Data
             var emailHash = Hash(email);
 
             var cmd = new NpgsqlCommand(@"
-        SELECT id, first_name, last_name, password_hash
+        SELECT id, first_name, last_name, password_hash, role_id
         FROM users
         WHERE email_hash = @eh AND deleted_at IS NULL
         LIMIT 1", conn);
@@ -150,7 +150,8 @@ namespace PA_BACKEND.Data
                     {
                         Id = reader.GetInt32(0),
                         FirstName = reader.GetString(1),
-                        LastName = reader.GetString(2)
+                        LastName = reader.GetString(2),
+                        RoleId = reader.GetInt32(4) 
                     };
                 }
             }
