@@ -15,7 +15,9 @@ namespace PA_BACKEND.Controllers
         private readonly UsuarioService _service;
         private readonly IConfiguration _config;
 
-        public LoginController(UsuarioService service, IConfiguration config)
+        public LoginController(
+            UsuarioService service,
+            IConfiguration config)
         {
             _service = service;
             _config = config;
@@ -40,18 +42,19 @@ namespace PA_BACKEND.Controllers
                     user = user
                 });
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest("Error al iniciar sesión");
+                return BadRequest(ex.Message); // temporal
             }
         }
 
-        private string GenerateToken(dynamic user)
+        private string GenerateToken(UsuarioDTO user)
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.FirstName),
+                new Claim("LastName", user.LastName),
+                new Claim("RoleId", user.RoleId.ToString()),
                 new Claim("UserId", user.Id.ToString())
             };
 
@@ -72,7 +75,8 @@ namespace PA_BACKEND.Controllers
                 signingCredentials: creds
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return new JwtSecurityTokenHandler()
+                .WriteToken(token);
         }
     }
 }
