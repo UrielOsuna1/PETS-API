@@ -12,6 +12,9 @@ namespace PA_BACKEND.Data
             _config = config;
         }
 
+        // =====================================================
+        // CREAR SOLICITUD
+        // =====================================================
         public async Task Crear(AdoptionRequestCreateDTO dto)
         {
             using var conn = _config.GetConnection();
@@ -30,6 +33,9 @@ namespace PA_BACKEND.Data
             await cmd.ExecuteNonQueryAsync();
         }
 
+        // =====================================================
+        // OBTENER TODAS LAS SOLICITUDES (ADMIN)
+        // =====================================================
         public async Task<List<AdoptionRequestDTO>> ObtenerTodas()
         {
             var lista = new List<AdoptionRequestDTO>();
@@ -38,10 +44,35 @@ namespace PA_BACKEND.Data
             await conn.OpenAsync();
 
             var cmd = new NpgsqlCommand(@"
-                SELECT id, user_id, pet_id, status_id, message, created_at
-                FROM adoption_requests
-                WHERE deleted_at IS NULL
-                ORDER BY created_at DESC", conn);
+SELECT
+    ar.id,
+    ar.user_id,
+    ar.pet_id,
+    ar.status_id,
+    ar.message,
+    ar.created_at,
+    ar.reviewed_at,
+
+    u.first_name,
+    u.last_name,
+
+    p.name,
+    p.species,
+    p.breed,
+    p.age,
+    p.img
+
+FROM adoption_requests ar
+
+INNER JOIN users u
+    ON u.id = ar.user_id
+
+INNER JOIN pets p
+    ON p.id = ar.pet_id
+
+WHERE ar.deleted_at IS NULL
+ORDER BY ar.created_at DESC
+", conn);
 
             var reader = await cmd.ExecuteReaderAsync();
 
@@ -54,13 +85,61 @@ namespace PA_BACKEND.Data
                     PetId = reader.GetInt32(2),
                     StatusId = reader.GetInt32(3),
                     Message = reader.GetString(4),
-                    CreatedAt = reader.GetDateTime(5)
+                    CreatedAt = reader.GetDateTime(5),
+
+                    ReviewedAt = reader.IsDBNull(6)
+                        ? (DateTime?)null
+                        : reader.GetDateTime(6),
+
+                    User = new RequestUserDTO
+                    {
+                        FullName =
+                            reader.GetString(7) + " " +
+                            reader.GetString(8),
+
+                        Email = "", // no se puede mostrar por estar cifrado
+                        Phone = ""
+                    },
+
+                    Pet = new RequestPetDTO
+                    {
+                        Id = reader.GetInt32(2),
+                        Name = reader.GetString(9),
+                        Species = reader.GetString(10),
+                        Breed = reader.GetString(11),
+                        AgeYears = reader.GetInt32(12),
+                        Images = new List<RequestPetImageDTO>
+                        {
+                            new RequestPetImageDTO
+                            {
+                                ImageUrl = reader.IsDBNull(13)
+                                    ? ""
+                                    : reader.GetString(13),
+
+                                IsPrimary = true
+                            }
+                        }
+                    },
+
+                    Status = new RequestStatusDTO
+                    {
+                        Name = reader.GetInt32(3) switch
+                        {
+                            1 => "Pendiente",
+                            2 => "Aprobada",
+                            3 => "Rechazada",
+                            _ => "Pendiente"
+                        }
+                    }
                 });
             }
 
             return lista;
         }
 
+        // =====================================================
+        // CAMBIAR ESTADO
+        // =====================================================
         public async Task CambiarEstado(int id, int statusId, int adminId)
         {
             using var conn = _config.GetConnection();
