@@ -17,11 +17,28 @@ namespace PA_BACKEND.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(
-            AdoptionRequestCreateDTO dto)
+        public async Task<IActionResult> Crear(AdoptionRequestCreateDTO dto)
         {
-            await _service.Crear(dto);
-            return Ok("Solicitud enviada");
+            try
+            {
+                // 🔥 VALIDACIONES
+                if (dto.UserId <= 0)
+                    return BadRequest("UserId inválido");
+
+                if (dto.PetId <= 0)
+                    return BadRequest("PetId inválido");
+
+                if (string.IsNullOrWhiteSpace(dto.Message))
+                    return BadRequest("Mensaje requerido");
+
+                await _service.Crear(dto);
+
+                return Ok(new { message = "Solicitud enviada" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpGet]

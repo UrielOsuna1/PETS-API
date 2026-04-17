@@ -20,17 +20,24 @@ namespace PA_BACKEND.Data
             using var conn = _config.GetConnection();
             await conn.OpenAsync();
 
-            var cmd = new NpgsqlCommand(@"
-                INSERT INTO adoption_requests
-                (user_id, pet_id, status_id, message, created_at)
-                VALUES
-                (@uid, @pid, 1, @msg, NOW())", conn);
+            try
+            {
+                var cmd = new NpgsqlCommand(@"
+            INSERT INTO adoption_requests
+            (user_id, pet_id, status_id, message, created_at)
+            VALUES
+            (@uid, @pid, 1, @msg, NOW())", conn);
 
-            cmd.Parameters.AddWithValue("@uid", dto.UserId);
-            cmd.Parameters.AddWithValue("@pid", dto.PetId);
-            cmd.Parameters.AddWithValue("@msg", dto.Message);
+                cmd.Parameters.AddWithValue("@uid", dto.UserId);
+                cmd.Parameters.AddWithValue("@pid", dto.PetId);
+                cmd.Parameters.AddWithValue("@msg", dto.Message);
 
-            await cmd.ExecuteNonQueryAsync();
+                await cmd.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al insertar en BD: " + ex.Message);
+            }
         }
 
         // =====================================================
