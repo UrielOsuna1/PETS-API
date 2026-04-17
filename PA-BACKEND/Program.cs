@@ -81,6 +81,7 @@ builder.Services.AddScoped<PetStatusService>();
 builder.Services.AddSingleton<PA_BACKEND.Data.PostgreSQLConfiguration>();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
+builder.Services.AddScoped<AdoptionRequestService>();
 
 // 📄 SWAGGER (ACTIVO EN PRODUCCIÓN)
 builder.Services.AddEndpointsApiExplorer();
