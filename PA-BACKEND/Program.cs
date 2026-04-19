@@ -9,8 +9,9 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers();
 
-
-// ✅ CORS (SIN AFECTAR FUNCIONALIDAD)
+//
+// ✅ CORS (RAILWAY + ANGULAR + SIN AFECTAR FUNCIONALIDAD)
+//
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -21,12 +22,14 @@ builder.Services.AddCors(options =>
                 "http://localhost:4200"
             )
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
-
+//
 // manejo de errores de modelo
+//
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
@@ -50,8 +53,9 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options 
     };
 });
 
-
+//
 // 🔐 AUTH
+//
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
@@ -84,8 +88,9 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddAuthorization();
 
-
+//
 // 🧩 DI
+//
 builder.Services.AddScoped<PA_BACKEND.Data.Interface.IAuthRepository, PA_BACKEND.Data.Repositories.AuthRepository>();
 builder.Services.AddScoped<PA_BACKEND.Data.Interface.ITokenRepository, PA_BACKEND.Data.Repositories.TokenRepository>();
 builder.Services.AddScoped<PA_BACKEND.Data.Interface.ICryptoRepository, PA_BACKEND.Data.Repositories.CryptoRepository>();
@@ -100,8 +105,9 @@ builder.Services.AddScoped<AdoptionRequestService>();
 builder.Services.AddSingleton<PA_BACKEND.Data.PostgreSQLConfiguration>();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
-
+//
 // 📄 SWAGGER
+//
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -142,8 +148,14 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+//
+// 🌐 Detecta proxy de Railway
+//
+app.UseForwardedHeaders();
 
+//
 // 🌐 SWAGGER
+//
 app.UseSwagger();
 
 app.UseSwaggerUI(c =>
@@ -152,8 +164,9 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-
+//
 // 🛑 manejo global de errores
+//
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
@@ -173,8 +186,9 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
-
+//
 // ✅ ORDEN CORRECTO PARA RAILWAY + CORS
+//
 app.UseRouting();
 
 app.UseCors("AllowAll");
@@ -189,8 +203,9 @@ app.UseTokenBlacklistValidation();
 
 app.MapControllers();
 
-
+//
 // 🚀 PUERTO PARA RAILWAY
+//
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 
 app.Run($"http://0.0.0.0:{port}");
