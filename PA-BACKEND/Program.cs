@@ -10,14 +10,18 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddControllers();
 
 
-// ✅ CORS (FUNCIONANDO PARA ANGULAR)
+// ✅ CORS (SIN AFECTAR FUNCIONALIDAD)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy
+            .WithOrigins(
+                "https://pets-front-production.up.railway.app",
+                "http://localhost:4200"
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     });
 });
 
@@ -36,7 +40,9 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options 
         {
             Success = false,
             Data = new object(),
-            Message = errors.Count > 0 ? string.Join("; ", errors) : PA_BACKEND.DTOs.Common.SecureMessages.ValidationError,
+            Message = errors.Count > 0
+                ? string.Join("; ", errors)
+                : PA_BACKEND.DTOs.Common.SecureMessages.ValidationError,
             ErrorCode = PA_BACKEND.DTOs.Common.ErrorCodes.ValidationError
         };
 
@@ -49,19 +55,31 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options 
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            ValidateAudience = true,
-            ValidateIssuer = true,
-            ValidateIssuerSigningKey = true,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero,
-            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key missing"))),
-            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT Issuer missing"),
-            ValidAudience = builder.Configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT Audience missing"),
-            RoleClaimType = System.Security.Claims.ClaimTypes.Role
-        };
+        options.TokenValidationParameters =
+            new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            {
+                ValidateAudience = true,
+                ValidateIssuer = true,
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+
+                IssuerSigningKey =
+                    new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
+                        System.Text.Encoding.UTF8.GetBytes(
+                            builder.Configuration["Jwt:Key"]
+                            ?? throw new InvalidOperationException("JWT Key missing"))),
+
+                ValidIssuer =
+                    builder.Configuration["Jwt:Issuer"]
+                    ?? throw new InvalidOperationException("JWT Issuer missing"),
+
+                ValidAudience =
+                    builder.Configuration["Jwt:Audience"]
+                    ?? throw new InvalidOperationException("JWT Audience missing"),
+
+                RoleClaimType = System.Security.Claims.ClaimTypes.Role
+            };
     });
 
 builder.Services.AddAuthorization();
@@ -77,13 +95,13 @@ builder.Services.AddSingleton<PostgreSQLConfiguration>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<MascotaService>();
 builder.Services.AddScoped<PetStatusService>();
+builder.Services.AddScoped<AdoptionRequestService>();
 
 builder.Services.AddSingleton<PA_BACKEND.Data.PostgreSQLConfiguration>();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
-builder.Services.AddScoped<AdoptionRequestService>();
 
-// 📄 SWAGGER (ACTIVO EN PRODUCCIÓN)
+// 📄 SWAGGER
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -94,37 +112,40 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API para el sistema de protección animal"
     });
 
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-    {
-        Description = "Authorization: Bearer {token}",
-        Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
+    c.AddSecurityDefinition("Bearer",
+        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
         {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-            {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
+            Description = "Authorization: Bearer {token}",
+            Name = "Authorization",
+            In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+            Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+            Scheme = "Bearer"
+        });
 
+    c.AddSecurityRequirement(
+        new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+        {
+            {
+                new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Reference =
+                        new Microsoft.OpenApi.Models.OpenApiReference
+                        {
+                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                },
+                Array.Empty<string>()
+            }
+        });
+});
 
 var app = builder.Build();
 
 
-// 🌐 SWAGGER SIEMPRE ACTIVO
+// 🌐 SWAGGER
 app.UseSwagger();
+
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "PA Backend API v1");
@@ -153,13 +174,17 @@ app.UseExceptionHandler(errorApp =>
 });
 
 
-// ✅ ORDEN CORRECTO (CLAVE)
+// ✅ ORDEN CORRECTO PARA RAILWAY + CORS
+app.UseRouting();
+
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.UseAuthorizationHeaderFix();
+
 app.UseTokenBlacklistValidation();
 
 app.MapControllers();
@@ -167,4 +192,5 @@ app.MapControllers();
 
 // 🚀 PUERTO PARA RAILWAY
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+
 app.Run($"http://0.0.0.0:{port}");
