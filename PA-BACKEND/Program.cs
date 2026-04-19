@@ -3,15 +3,24 @@ using PA_BACKEND.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// cargar configuración
-builder.Configuration.AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true);
+// ================================
+// CONFIGURACIÓN
+// ================================
+builder.Configuration.AddJsonFile(
+    "Properties/launchSettings.json",
+    optional: true,
+    reloadOnChange: true);
+
 builder.Configuration.AddEnvironmentVariables();
 
+// ================================
+// SERVICIOS
+// ================================
 builder.Services.AddControllers();
 
-//
-// ✅ CORS (RAILWAY + ANGULAR + SIN AFECTAR FUNCIONALIDAD)
-//
+// ================================
+// CORS (ANGULAR + RAILWAY)
+// ================================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -21,15 +30,15 @@ builder.Services.AddCors(options =>
                 "https://pets-front-production.up.railway.app",
                 "http://localhost:4200"
             )
-            .AllowAnyMethod()
             .AllowAnyHeader()
+            .AllowAnyMethod()
             .AllowCredentials();
     });
 });
 
-//
-// manejo de errores de modelo
-//
+// ================================
+// MANEJO DE ERRORES DE MODELO
+// ================================
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
@@ -53,9 +62,9 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options 
     };
 });
 
-//
-// 🔐 AUTH
-//
+// ================================
+// JWT AUTH
+// ================================
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
@@ -88,9 +97,9 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddAuthorization();
 
-//
-// 🧩 DI
-//
+// ================================
+// DEPENDENCY INJECTION
+// ================================
 builder.Services.AddScoped<PA_BACKEND.Data.Interface.IAuthRepository, PA_BACKEND.Data.Repositories.AuthRepository>();
 builder.Services.AddScoped<PA_BACKEND.Data.Interface.ITokenRepository, PA_BACKEND.Data.Repositories.TokenRepository>();
 builder.Services.AddScoped<PA_BACKEND.Data.Interface.ICryptoRepository, PA_BACKEND.Data.Repositories.CryptoRepository>();
@@ -105,10 +114,11 @@ builder.Services.AddScoped<AdoptionRequestService>();
 builder.Services.AddSingleton<PA_BACKEND.Data.PostgreSQLConfiguration>();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
-//
-// 📄 SWAGGER
-//
+// ================================
+// SWAGGER
+// ================================
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new()
@@ -148,14 +158,14 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-//
-// 🌐 Detecta proxy de Railway
-//
+// ================================
+// FORWARDED HEADERS (RAILWAY)
+// ================================
 app.UseForwardedHeaders();
 
-//
-// 🌐 SWAGGER
-//
+// ================================
+// SWAGGER
+// ================================
 app.UseSwagger();
 
 app.UseSwaggerUI(c =>
@@ -164,9 +174,9 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-//
-// 🛑 manejo global de errores
-//
+// ================================
+// MANEJO GLOBAL DE ERRORES
+// ================================
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
@@ -186,12 +196,27 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
-//
-// ✅ ORDEN CORRECTO PARA RAILWAY + CORS
-//
+// ================================
+// PIPELINE HTTP
+// ================================
+app.UseHttpsRedirection();
+
 app.UseRouting();
 
 app.UseCors("AllowAll");
+
+// 🔥 SOLUCIÓN CORS PREFLIGHT OPTIONS
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.StatusCode = 200;
+        await context.Response.CompleteAsync();
+        return;
+    }
+
+    await next();
+});
 
 app.UseAuthentication();
 
@@ -203,9 +228,9 @@ app.UseTokenBlacklistValidation();
 
 app.MapControllers();
 
-//
-// 🚀 PUERTO PARA RAILWAY
-//
+// ================================
+// PUERTO RAILWAY
+// ================================
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 
 app.Run($"http://0.0.0.0:{port}");
