@@ -18,4 +18,10 @@
     <PackageReference Include="Npgsql" Version="8.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PA-BACKEND.Data\PA-BACKEND.Data.csproj" />
+    <ProjectReference Include="..\PA-BACKEND.DTOs\PA-BACKEND.DTOs.csproj" />
+    <ProjectReference Include="..\PA-BACKEND.Model\PA-BACKEND.Model.csproj" />
+  </ItemGroup>
+
 </Project>
