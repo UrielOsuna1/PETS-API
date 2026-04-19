@@ -144,9 +144,6 @@ ORDER BY ar.created_at DESC
             return lista;
         }
 
-        // =====================================================
-        // CAMBIAR ESTADO
-        // =====================================================
         public async Task CambiarEstado(int id, int statusId, int adminId)
         {
             using var conn = _config.GetConnection();

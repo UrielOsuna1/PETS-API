@@ -10,17 +10,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.6">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\PA-BACKEND.Data\PA-BACKEND.Data.csproj" />
-    <ProjectReference Include="..\PA-BACKEND.DTOs\PA-BACKEND.DTOs.csproj" />
-    <ProjectReference Include="..\PA-BACKEND.Model\PA-BACKEND.Model.csproj" />
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Npgsql" Version="8.0.4" />
   </ItemGroup>
 
 </Project>

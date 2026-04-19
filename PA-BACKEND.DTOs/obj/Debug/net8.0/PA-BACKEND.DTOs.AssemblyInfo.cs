@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PA-BACKEND.DTOs")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5b84058f9b5eec158b729bd31480fcaa5c8b0248")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+18ba6fcd737b6d6f08ff869052eeea4b7fc6e3eb")]
 [assembly: System.Reflection.AssemblyProductAttribute("PA-BACKEND.DTOs")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PA-BACKEND.DTOs")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

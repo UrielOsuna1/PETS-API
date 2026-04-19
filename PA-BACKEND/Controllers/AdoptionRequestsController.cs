@@ -17,11 +17,17 @@ namespace PA_BACKEND.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(AdoptionRequestCreateDTO dto)
+        public async Task<IActionResult> Crear([FromBody] AdoptionRequestCreateDTO dto)
         {
             try
             {
-                // 🔥 VALIDACIONES
+                if (dto == null)
+                    return BadRequest("DTO vacío");
+
+                Console.WriteLine($"USER: {dto.UserId}");
+                Console.WriteLine($"PET: {dto.PetId}");
+                Console.WriteLine($"MSG: {dto.Message}");
+
                 if (dto.UserId <= 0)
                     return BadRequest("UserId inválido");
 
@@ -37,7 +43,10 @@ namespace PA_BACKEND.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                Console.WriteLine("🔥 ERROR REAL:");
+                Console.WriteLine(ex.ToString());
+
+                return StatusCode(500, ex.ToString());
             }
         }
 
