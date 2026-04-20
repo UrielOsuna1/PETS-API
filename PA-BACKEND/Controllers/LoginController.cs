@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // 🔥 IMPORTANTE
 using Microsoft.IdentityModel.Tokens;
 using PA_BACKEND.Data;
 using PA_BACKEND.DTOs;
@@ -23,6 +24,7 @@ namespace PA_BACKEND.Controllers
             _config = config;
         }
 
+        [AllowAnonymous] // 🔥 AQUÍ ESTÁ LA CLAVE
         [HttpPost]
         public async Task<IActionResult> Login(LoginDTO dto)
         {
@@ -44,7 +46,7 @@ namespace PA_BACKEND.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message); // temporal
+                return BadRequest(ex.Message);
             }
         }
 
