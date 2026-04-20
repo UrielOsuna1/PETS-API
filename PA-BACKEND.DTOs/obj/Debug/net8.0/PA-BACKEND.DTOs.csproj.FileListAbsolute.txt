@@ -46,3 +46,19 @@ C:\Users\Jesus\OneDrive\Desktop\sdasa\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.
 C:\Users\Jesus\OneDrive\Desktop\sdasa\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\refint\PA-BACKEND.DTOs.dll
 C:\Users\Jesus\OneDrive\Desktop\sdasa\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\PA-BACKEND.DTOs.pdb
 C:\Users\Jesus\OneDrive\Desktop\sdasa\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\ref\PA-BACKEND.DTOs.dll
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\bin\Debug\net8.0\PA-BACKEND.DTOs.deps.json
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\bin\Debug\net8.0\PA-BACKEND.DTOs.dll
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\bin\Debug\net8.0\PA-BACKEND.DTOs.pdb
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\bin\Debug\net8.0\PA-BACKEND.Model.dll
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\bin\Debug\net8.0\PA-BACKEND.Model.pdb
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\PA-BACKEND.DTOs.csproj.AssemblyReference.cache
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\PA-BACKEND.DTOs.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\PA-BACKEND.DTOs.AssemblyInfoInputs.cache
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\PA-BACKEND.DTOs.AssemblyInfo.cs
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\PA-BACKEND.DTOs.csproj.CoreCompileInputs.cache
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\PA-BACKEND.DTOs.sourcelink.json
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\PA-BACKE.AF943117.Up2Date
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\PA-BACKEND.DTOs.dll
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\refint\PA-BACKEND.DTOs.dll
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\PA-BACKEND.DTOs.pdb
+C:\Users\Jesus\OneDrive\Desktop\api para web que se borro en el servidor\PA-BACKEND\PA-BACKEND.DTOs\obj\Debug\net8.0\ref\PA-BACKEND.DTOs.dll

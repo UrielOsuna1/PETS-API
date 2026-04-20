@@ -203,20 +203,8 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+// 🔥 CORS en el lugar correcto
 app.UseCors("AllowAll");
-
-// 🔥 SOLUCIÓN CORS PREFLIGHT OPTIONS
-app.Use(async (context, next) =>
-{
-    if (context.Request.Method == "OPTIONS")
-    {
-        context.Response.StatusCode = 200;
-        await context.Response.CompleteAsync();
-        return;
-    }
-
-    await next();
-});
 
 app.UseAuthentication();
 
